@@ -36,7 +36,7 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
         strcpy(msg, "PING");
         if (sendto(udpSd, (char*)msg, sizeof(msg), 0, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
 
-            cout << "the thing didn't send through" << endl;
+            cout << "failed to punch" << endl;
             exit(1);
 
         }
@@ -57,7 +57,7 @@ void rcv(int clientSd) {
         }
         if (!strcmp(msg, "exit"))
         {
-            cout << "Server has quit the session" << endl;
+            cout << "someone has quit the session" << endl;
             break;
         }
         cout << ">someone: " << msg << endl;
@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
                 flg1 = true;
             }
             if (strlen(msg) == 15) {
-                cout << "puching done" << endl;
+                cout << "punching done" << endl;
                 exitSignal1.set_value();
                 t1.join();
                 flg2 = true;
