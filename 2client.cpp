@@ -31,7 +31,7 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
 
     while (futureObj.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
 
-        cout << "bang" << endl;
+        //cout << "bang" << endl;
         memset(&msg, 0, sizeof(msg));//clear the buffer
         strcpy(msg, "PING");
         if (sendto(udpSd, (char*)msg, sizeof(msg), 0, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     while(1) {
         memset(&msg, 0, sizeof(msg));//clear the buffer
         if (recv(udpSd, (char*)msg, sizeof(msg), 0) != -1) {
-            cout << "the other side: " << msg << " size: " << strlen(msg) << endl;
+            cout << "the other side: " << msg /*<< size: " << strlen(msg) */<< endl;
             if (strlen(msg) == 4 || strlen(msg) == 15) {
                 cout << "THE HOLE's HERE, telling others.." << endl;
                 sendto(udpSd, "WE GOT THE HOLE", 15, 0, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr));
