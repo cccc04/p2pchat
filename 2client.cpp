@@ -54,6 +54,7 @@ void rcv(int clientSd) {
 
         if (recv(clientSd, (char*)&msg, sizeof(msg), 0) == -1) {
             cout << "cant recv" << endl;
+            sleep(3);
         }
         if (!strcmp(msg, "exit"))
         {
