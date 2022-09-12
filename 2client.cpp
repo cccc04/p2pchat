@@ -33,7 +33,7 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
 
         //cout << "bang" << endl;
         memset(&msg, 0, sizeof(msg));//clear the buffer
-        strcpy(msg, "PING");
+        strcpy(msg, "BANG");
         if (sendto(udpSd, (char*)msg, sizeof(msg), 0, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
 
             cout << "failed to punch" << endl;
@@ -111,12 +111,12 @@ int main(int argc, char* argv[])
         memset(&msg, 0, sizeof(msg));//clear the buffer
         if (recv(udpSd, (char*)msg, sizeof(msg), 0) != -1) {
             cout << "the other side: " << msg /*<< size: " << strlen(msg) */<< endl;
-            if (strlen(msg) == 4 || strlen(msg) == 15) {
+            if (!strcmp(msg, "BANG")) {
                 cout << "THE HOLE's HERE, telling others.." << endl;
                 sendto(udpSd, "WE GOT THE HOLE", 15, 0, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr));
                 flg1 = true;
             }
-            if (strlen(msg) == 15) {
+            if (!strcmp(msg, "WE GOT THE HOLE")) {
                 cout << "punching done" << endl;
                 exitSignal1.set_value();
                 t1.join();
@@ -171,6 +171,12 @@ int main(int argc, char* argv[])
         {
             send(tcpSd, (char*)&msg, strlen(msg), 0);
             break;
+        }
+        if (data == "*.txt")
+        {
+            
+            send(tcpSd, (char*)&msg, strlen(msg), 0);
+            cout << "11" << endl;
         }
         if (send(tcpSd, (char*)&msg, strlen(msg), 0) == -1) {
 
