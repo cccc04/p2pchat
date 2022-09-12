@@ -40,7 +40,7 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
             exit(1);
 
         }
-        sleep(10);
+        sleep(7);
     }
 
 }
@@ -146,10 +146,10 @@ int main(int argc, char* argv[])
 
     if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
         cout << "cantconnect, retrying once.." << endl;
-        sleep(5);
+        sleep(3);
         if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
             cout << "cantconnect, retrying twice.." << endl;
-            sleep(5);
+            sleep(4);
             if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
                 cout << "cantconnect, abort" << endl;
                 exit(1);
