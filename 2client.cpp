@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     }
 
     if (bind(udpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) < 0) {
-        cerr << "cantbind" << endl;
+        cerr << "cantbind, maybe try another port" << endl;
         exit(1);
     }
 
@@ -173,11 +173,21 @@ int main(int argc, char* argv[])
             send(tcpSd, (char*)&msg, strlen(msg), 0);
             break;
         }
-        if (data == "*.txt")
+        if ((data.find(".txt") != std::string::npos) || (data.find(".doc") != std::string::npos) || (data.find(".docx") != std::string::npos) || 
+            (data.find(".xlsx") != std::string::npos) || (data.find(".cpp") != std::string::npos) || (data.find(".c") != std::string::npos))
         {
-            
+            string drtry;
+            cout << "Directory: ";
+            getline(cin, drtry);
+            ifstream f1;
+            f1.open(drtry + data);
             send(tcpSd, (char*)&msg, strlen(msg), 0);
-            cout << "11" << endl;
+            if (f1.is_open()){
+                cout << "11" << endl;
+            }
+            else {
+                cout << "No such file or directory" << endl;
+            }
         }
         if (send(tcpSd, (char*)&msg, strlen(msg), 0) == -1) {
 
