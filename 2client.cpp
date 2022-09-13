@@ -108,10 +108,10 @@ int main(int argc, char* argv[])
     cout << "punching.." << endl;
     bool flg1 = false;
     bool flg2 = false;
-    while(1) {
+    /*while (1) {
         memset(&msg, 0, sizeof(msg));//clear the buffer
         if (recv(udpSd, (char*)msg, sizeof(msg), 0) != -1) {
-            cout << "the other side: " << msg /*<< size: " << strlen(msg) */<< endl;
+            cout << "the other side: " << msg << endl;
             if (!strcmp(msg, "BANG")) {
                 cout << "THE HOLE's HERE, telling others.." << endl;
                 sendto(udpSd, "WE GOT THE HOLE", 15, 0, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr));
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
             break;
             exit(1);
         }
-    }
+    }*/
 
     int tcpSd = socket(AF_INET, SOCK_STREAM, 0);
     if (tcpSd == -1) {
@@ -157,8 +157,11 @@ int main(int argc, char* argv[])
             }
         }
     }
-    cout << "connected" << endl;
 
+    cout << "hole's ready" << endl;
+    exitSignal1.set_value();
+    t1.join();
+    cout << "connected" << endl;
 
     std::thread t2(rcv, tcpSd);
     while (1)
