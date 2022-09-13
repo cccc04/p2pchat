@@ -176,18 +176,28 @@ int main(int argc, char* argv[])
         if ((data.find(".txt") != std::string::npos) || (data.find(".doc") != std::string::npos) || (data.find(".docx") != std::string::npos) || 
             (data.find(".xlsx") != std::string::npos) || (data.find(".cpp") != std::string::npos) || (data.find(".c") != std::string::npos))
         {
-            string drtry;
-            cout << "Directory: ";
-            getline(cin, drtry);
             ifstream f1;
-            f1.open(drtry + data);
+            string drtry;
+            while (1) {
+                cout << "Directory: ";
+                getline(cin, drtry);
+                f1.open(drtry + data);
+                if (f1.is_open()) {
+                    cout << "11" << endl;
+                    break;
+                }
+                else {
+                    cout << "No such file or directory  " << endl;
+                    cout << "File name: " ;
+                    getline(cin, data);
+                    if (data == "exit") {
+                        break;
+                    }
+                }
+
+            }
             send(tcpSd, (char*)&msg, strlen(msg), 0);
-            if (f1.is_open()){
-                cout << "11" << endl;
-            }
-            else {
-                cout << "No such file or directory" << endl;
-            }
+
         }
         if (send(tcpSd, (char*)&msg, strlen(msg), 0) == -1) {
 
