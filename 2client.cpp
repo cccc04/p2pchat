@@ -69,11 +69,11 @@ void rcv(int clientSd) {
 int main(int argc, char* argv[])
 {
     //we need 2 things: ip address and port number, in that order
-    if (argc != 3)
+    if (argc != 4)
     {
-        cerr << "Usage: ip_address port" << endl; exit(0);
+        cerr << "Usage: ip_address sendport receiveport" << endl; exit(0);
     } //grab the IP address and port number 
-    char* serverIp = argv[1]; int port = atoi(argv[2]);
+    char* serverIp = argv[1]; int sport = atoi(argv[2]); int rport = atoi(argv[3]);
     //create a message buffer 
     char msg[1500];
     //setup a socket and connection tools 
@@ -83,13 +83,13 @@ int main(int argc, char* argv[])
     bzero((char*)&sendSockAddr, sizeof(sendSockAddr));
     sendSockAddr.sin_family = AF_INET;
     sendSockAddr.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*host->h_addr_list));
-    sendSockAddr.sin_port = htons(port);
+    sendSockAddr.sin_port = htons(sport);
 
     sockaddr_in myAddr;
     bzero((char*)&myAddr, sizeof(myAddr));
     myAddr.sin_family = AF_INET;
     myAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    myAddr.sin_port = htons(port);
+    myAddr.sin_port = htons(rport);
 
     int udpSd = socket(AF_INET, SOCK_DGRAM, 0);
     if (udpSd == -1) {
