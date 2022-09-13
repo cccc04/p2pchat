@@ -96,10 +96,10 @@ int main(int argc, char* argv[])
         cout << "cantsocket" << endl;
     }
 
-    /*if (bind(udpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) < 0) {
+    if (bind(udpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) < 0) {
         cerr << "cantbind, maybe try another port" << endl;
         exit(1);
-    }*/
+    }
 
     std::promise<void> exitSignal1;
     std::future<void> futureObj1 = exitSignal1.get_future();
