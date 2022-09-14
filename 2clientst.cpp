@@ -29,19 +29,23 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
 
     char msg[1500];
 
-    while (futureObj.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
+    for (int i = 0; i < 6; i++) {
 
-        cout << "bang" << endl;
-        memset(&msg, 0, sizeof(msg));//clear the buffer
-        strcpy(msg, "BANG");
-        if (sendto(udpSd, (char*)msg, sizeof(msg), 0, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
+        while (futureObj.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
 
-            cout << "failed to punch" << endl;
-            exit(1);
+            cout << "bang" << endl;
+            memset(&msg, 0, sizeof(msg));//clear the buffer
+            strcpy(msg, "BANG");
+            if (sendto(udpSd, (char*)msg, sizeof(msg), 0, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
+
+                cout << "failed to punch" << endl;
+                exit(1);
+
+            }
+
+            sleep(1);
 
         }
-
-        sleep(1);
 
     }
 
