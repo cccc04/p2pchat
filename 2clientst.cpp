@@ -29,9 +29,7 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
 
     char msg[1500];
 
-    for (int i = 0; i < 6; i++) {
-
-        if(futureObj.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
+        while(futureObj.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
 
             cout << "bang" << endl;
             memset(&msg, 0, sizeof(msg));//clear the buffer
@@ -46,9 +44,6 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
             sleep(1);
 
         }
-
-    }
-    close(udppSd);
 
 }
 
@@ -201,9 +196,7 @@ int main(int argc, char* argv[])
         cout << "cantsocket" << endl;
     }
 
-    struct timeval tv = {
-    .tv_sec = 6
-    };
+    struct timeval tv = {    .tv_sec = 6    };
     if (setsockopt(udpSd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
         cout << "prblm2" << endl;
     }
