@@ -37,13 +37,12 @@ void punch(sockaddr_in sendSockAddr, std::future<void> futureObj) {
     for(i = 0; i < 10; i++){
         if(futureObj.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
 
-            cout << "bang" << endl;
+            //cout << "bang" << endl;
             memset(&msg, 0, sizeof(msg));//clear the buffer
             strcpy(msg, "BANG");
             if (sendto(udpSd, (char*)msg, sizeof(msg), 0, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
 
                 cout << "failed to punch" << endl;
-                exit(1);
 
             }
 
@@ -184,9 +183,9 @@ int main(int argc, char* argv[])
     recv(clientSd, (char*)&svmsg3, sizeof(svmsg3), 0);
     const char* pt2 = svmsg3;
     //close(clientSd);
-    cout << pt0 << endl;
-    cout << pt << endl;
-    cout << pt2 << endl;
+    cout << pt0 << "/" << svmsg1 << endl;
+    cout << pt << "/" << svmsg2 << endl;
+    cout << pt2 << "/" << svmsg3 << endl;
 
 
     //create a message buffer 
@@ -263,15 +262,21 @@ int main(int argc, char* argv[])
     }
 
     if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
-        cout << "cantconnect, retrying once.." << endl;
-        sleep(3);
-        if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
-            cout << "cantconnect, retrying twice.." << endl;
-            sleep(4);
+
+        if (yyn == false) {
+            cout << "cantconnect, retrying once.." << endl;
+            sleep(3);
             if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
-                cout << "cantconnect, relaying.." << endl;
+                cout << "cantconnect, retrying twice.." << endl;
+                sleep(4);
+                if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
+                    cout << "cantconnect, abort" << endl;
+                    exit(1);
+                }
             }
+
         }
+
     }
 
     if(yyn == false) {
