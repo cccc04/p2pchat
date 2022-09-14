@@ -249,7 +249,7 @@ int main(int argc, char* argv[])
     if (flg1 == false && flg2 == false) {
 
         cout << "need relay" << endl;
-        string data = "punchedthrough";
+        string data = "punchedfail";
         memset(&msg, 0, sizeof(msg));//clear the buffer
         strcpy(msg, (data).c_str());
         send(clientSd, (char*)&msg, strlen(msg), 0);
