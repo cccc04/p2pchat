@@ -246,6 +246,11 @@ int main(int argc, char* argv[])
     std::thread t2;
     cout << flg1 << flg2 << endl;
 
+    if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
+        cout << "cantbindtcp" << endl;
+        exit(1);
+    }
+
     if (flg1 == false && flg2 == false) {
 
         cout << "need relay" << endl;
@@ -282,11 +287,6 @@ int main(int argc, char* argv[])
         send(clientSd, (char*)&msg, strlen(msg), 0);
         memset(&msg, 0, sizeof(msg));//clear the buffer
         close(clientSd);
-
-        if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
-            cout << "cantbindtcp" << endl;
-            exit(1);
-        }
 
         t2 = std::thread(rcv, tcpSd);
         snd(tcpSd);
