@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     } //grab the IP address and port number
 
     char* serverIp = "10.0.0.82"; int svport = 11111;
-    char svmsg[1500];
+    char svmsg[1500], svmsg1[1500], svmsg2[1500], svmsg3[1500];
     //setup a socket and connection tools 
     struct hostent* svhost = gethostbyname(serverIp);
     sockaddr_in svAddr;
@@ -99,29 +99,29 @@ int main(int argc, char* argv[])
     strcpy(svmsg, tgtip);
     send(clientSd, (char*)&svmsg, strlen(svmsg), 0);
     int sport; int rport;
-    memset(&svmsg, 0, sizeof(svmsg));
-    recv(clientSd, (char*)&svmsg, sizeof(svmsg), 0);
-    struct hostent* tgt = gethostbyname(svmsg);
-    cout << svmsg << endl;
-    memset(&svmsg, 0, sizeof(svmsg));
-    recv(clientSd, (char*)&svmsg, sizeof(svmsg), 0);
-    const char* pt = svmsg;
-    cout << svmsg << endl;
-    memset(&svmsg, 0, sizeof(svmsg));
-    recv(clientSd, (char*)&svmsg, sizeof(svmsg), 0);
-    const char* pt2 = svmsg;
-    cout << svmsg << endl;
-    memset(&svmsg, 0, sizeof(svmsg));
+    memset(&svmsg1, 0, sizeof(svmsg1));
+    recv(clientSd, (char*)&svmsg1, sizeof(svmsg1), 0);
+    const char* pt0 = svmsg1;
+    memset(&svmsg2, 0, sizeof(svmsg2));
+    recv(clientSd, (char*)&svmsg2, sizeof(svmsg2), 0);
+    const char* pt = svmsg2;
+    memset(&svmsg3, 0, sizeof(svmsg3));
+    recv(clientSd, (char*)&svmsg3, sizeof(svmsg3), 0);
+    const char* pt2 = svmsg3;
     close(clientSd);
+    cout << pt0 << endl;
+    cout << pt << endl;
+    cout << pt2 << endl;
 
     //create a message buffer 
     char msg[1500]; sport = atoi(pt); rport = atoi(pt2);
     //setup a socket and connection tools 
+    struct hostent* host = gethostbyname(pt0);
     sockaddr_in sendSockAddr;
     socklen_t ssz = sizeof(sendSockAddr);
     bzero((char*)&sendSockAddr, sizeof(sendSockAddr));
     sendSockAddr.sin_family = AF_INET;
-    sendSockAddr.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*tgt->h_addr_list));
+    sendSockAddr.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*host->h_addr_list));
     sendSockAddr.sin_port = htons(sport);
 
     sockaddr_in myAddr;
