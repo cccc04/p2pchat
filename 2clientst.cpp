@@ -174,21 +174,45 @@ int main(int argc, char* argv[])
     send(clientSd, (char*)&svmsg, strlen(svmsg), 0);
     int sport; int rport;
     memset(&svmsg1, 0, sizeof(svmsg1));
-    while (recv(clientSd, (char*)&svmsg1, sizeof(svmsg1), 0) == 0) {
-        memset(&svmsg1, 0, sizeof(svmsg1));
-        cout << "1" << endl;
+    while (1) {
+        if (recv(clientSd, (char*)&svmsg1, sizeof(svmsg1), 0) < 0) {
+            cout << "didntrcv" << endl;
+        }
+        if(sizeof(svmsg1) == 0){
+            memset(&svmsg1, 0, sizeof(svmsg1));
+            cout << "1" << endl;
+        }
+        else {
+            break;
+        }
     }
     const char* pt0 = svmsg1;
     memset(&svmsg2, 0, sizeof(svmsg2));
-    while (recv(clientSd, (char*)&svmsg2, sizeof(svmsg2), 0) == 0) {
-        memset(&svmsg2, 0, sizeof(svmsg2));
-        cout << "1" << endl;
+    while (1) {
+        if (recv(clientSd, (char*)&svmsg2, sizeof(svmsg2), 0) < 0) {
+            cout << "didntrcv" << endl;
+        }
+        if (sizeof(svmsg2) == 0) {
+            memset(&svmsg2, 0, sizeof(svmsg2));
+            cout << "1" << endl;
+        }
+        else {
+            break;
+        }
     }
     const char* pt = svmsg2;
     memset(&svmsg3, 0, sizeof(svmsg3));
-    while (recv(clientSd, (char*)&svmsg3, sizeof(svmsg3), 0) == 0) {
-        memset(&svmsg3, 0, sizeof(svmsg3));
-        cout << "1" << endl;
+    while (1) {
+        if (recv(clientSd, (char*)&svmsg3, sizeof(svmsg3), 0) < 0) {
+            cout << "didntrcv" << endl;
+        }
+        if (sizeof(svmsg3) == 0) {
+            memset(&svmsg3, 0, sizeof(svmsg3));
+            cout << "1" << endl;
+        }
+        else {
+            break;
+        }
     }
     const char* pt2 = svmsg3;
     //close(clientSd);
