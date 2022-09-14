@@ -29,7 +29,7 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
 
     char msg[1500];
 
-    while (futureObj.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
+    while (futureObj.wait_for(std::chrono::milliseconds(500)) == std::future_status::timeout) {
 
         //cout << "bang" << endl;
         memset(&msg, 0, sizeof(msg));//clear the buffer
@@ -40,7 +40,7 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
             exit(1);
 
         }
-        sleep(7);
+
     }
 
 }
@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
     cout << "punching.." << endl;
     bool flg1 = false;
     bool flg2 = false;
-    /**/while (1) {
+    /*while (1) {
         memset(&msg, 0, sizeof(msg));//clear the buffer
         if (recv(udpSd, (char*)msg, sizeof(msg), 0) != -1) {
             cout << "the other side: " << msg << endl;
@@ -172,14 +172,14 @@ int main(int argc, char* argv[])
             break;
             exit(1);
         }
-    }
+    }*/
 
     int tcpSd = socket(AF_INET, SOCK_STREAM, 0);
     if (tcpSd == -1) {
         cout << "canttcpsocket" << endl;
     }
 
-    /**/if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
+    if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
         cout << "cantbindtcp" << endl;
         exit(1);
     }
