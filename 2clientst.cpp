@@ -179,10 +179,10 @@ int main(int argc, char* argv[])
         cout << "canttcpsocket" << endl;
     }
 
-    /*if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
+    /**/if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
         cout << "cantbindtcp" << endl;
         exit(1);
-    }*/
+    }
 
     if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
         cout << "cantconnect, retrying once.." << endl;
