@@ -213,7 +213,7 @@ int main(int argc, char* argv[])
     cout << "punching.." << endl;
     bool flg1 = false;
     bool flg2 = false;
-    /**/while (1) {
+    /*while (1) {
         memset(&msg, 0, sizeof(msg));//clear the buffer
         if (recv(udpSd, (char*)msg, sizeof(msg), 0) != -1) {
             cout << "the other side: " << msg << endl;
@@ -239,45 +239,43 @@ int main(int argc, char* argv[])
             t1.join();
             break;
         }
-    }
+    }*/
 
     std::thread t2;
-    cout << flg1 << flg2 << endl;
 
     if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
         cout << "cantbindtcp" << endl;
         exit(1);
     }
 
-    if (flg1 == false && flg2 == false) {
+    bool yn;
 
-        cout << "need relay" << endl;
-        string data = "punchedfail";
-        memset(&msg, 0, sizeof(msg));//clear the buffer
-        strcpy(msg, (data).c_str());
-        send(clientSd, (char*)&msg, strlen(msg), 0);
-        memset(&msg, 0, sizeof(msg));//clear the buffer
-        t2 = std::thread(rcv, clientSd);
-        snd(clientSd);
-
-    }
-    else if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
+    if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
         cout << "cantconnect, retrying once.." << endl;
         sleep(3);
         if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
             cout << "cantconnect, retrying twice.." << endl;
             sleep(4);
             if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
-                cout << "cantconnect, abort" << endl;
-                exit(1);
+                cout << "cantconnect, relaying.." << endl;
+                string data = "punchedfail";
+                memset(&msg, 0, sizeof(msg));//clear the buffer
+                strcpy(msg, (data).c_str());
+                send(clientSd, (char*)&msg, strlen(msg), 0);
+                memset(&msg, 0, sizeof(msg));//clear the buffer
+                exitSignal1.set_value();
+                t1.join();
+                t2 = std::thread(rcv, clientSd);
+                snd(clientSd);
+                yn = true;
             }
         }
     }
-    else {
+    if(yn == false) {
 
-        /*cout << "hole's ready" << endl;
+        cout << "hole's ready" << endl;
         exitSignal1.set_value();
-        t1.join();*/
+        t1.join();
         cout << "connected" << endl;
         string data = "punchedthrough";
         memset(&msg, 0, sizeof(msg));//clear the buffer
@@ -292,6 +290,9 @@ int main(int argc, char* argv[])
     }
 
     t2.join();
+    if (yn == true) {
+        close(clientSd);
+    }
     close(tcpSd);
     close(udpSd);
     cout << "********Session********" << endl;
