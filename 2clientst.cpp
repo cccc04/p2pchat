@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
         cerr << "Usage: cipher " << endl; exit(0);
     } //grab the IP address and port number
 
-    char* serverIp = "24.5.179.24"; int svport = 11111;
+    char* serverIp = "10.0.0.82"; int svport = 11111;
     char svmsg[1500], svmsg1[1500], svmsg2[1500], svmsg3[1500];
     //setup a socket and connection tools 
     struct hostent* svhost = gethostbyname(serverIp);
@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
     cout << "punching.." << endl;
     bool flg1 = false;
     bool flg2 = false;
-    /*while (1) {
+    /**/while (1) {
         memset(&msg, 0, sizeof(msg));//clear the buffer
         if (recv(udpSd, (char*)msg, sizeof(msg), 0) != -1) {
             cout << "the other side: " << msg << endl;
@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
             break;
             exit(1);
         }
-    }*/
+    }
 
     int tcpSd = socket(AF_INET, SOCK_STREAM, 0);
     if (tcpSd == -1) {
@@ -197,9 +197,9 @@ int main(int argc, char* argv[])
         }
     }
 
-    cout << "hole's ready" << endl;
+    /*cout << "hole's ready" << endl;
     exitSignal1.set_value();
-    t1.join();
+    t1.join();*/
     cout << "connected" << endl;
 
     std::thread t2(rcv, tcpSd);
