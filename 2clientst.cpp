@@ -41,7 +41,7 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
 
         }
 
-        sleep(5);
+        sleep(1);
 
     }
 
@@ -68,6 +68,55 @@ void rcv(int clientSd) {
 
 }
 
+void snd(int tcpSd) {
+    char msg[1500];
+    while (1)
+    {
+
+        string data, hd;
+        getline(cin, data);
+        memset(&msg, 0, sizeof(msg));//clear the buffer
+        strcpy(msg, (data).c_str());
+        if (data == "exit")
+        {
+            send(tcpSd, (char*)&msg, strlen(msg), 0);
+            break;
+        }
+        if ((data.find(".txt") != std::string::npos) || (data.find(".doc") != std::string::npos) || (data.find(".docx") != std::string::npos) ||
+            (data.find(".xlsx") != std::string::npos) || (data.find(".cpp") != std::string::npos) || (data.find(".c") != std::string::npos))
+        {
+            ifstream f1;
+            string drtry;
+            while (1) {
+                cout << "Directory: ";
+                getline(cin, drtry);
+                f1.open(drtry + data);
+                if (f1.is_open()) {
+                    cout << "11" << endl;
+                    break;
+                }
+                else {
+                    cout << "No such file or directory  " << endl;
+                    cout << "File name: ";
+                    getline(cin, data);
+                    if (data == "exit") {
+                        break;
+                    }
+                }
+
+            }
+            send(tcpSd, (char*)&msg, strlen(msg), 0);
+
+        }
+        if (send(tcpSd, (char*)&msg, strlen(msg), 0) == -1) {
+
+            cout << "didn't send through" << endl;
+        }
+
+    }
+
+}
+
 int main(int argc, char* argv[])
 {
     //we need 2 things: ip address and port number, in that order
@@ -76,7 +125,7 @@ int main(int argc, char* argv[])
         cerr << "Usage: cipher " << endl; exit(0);
     } //grab the IP address and port number
 
-    char* serverIp = "24.5.179.24"; int svport = 11111;
+    char* serverIp = "10.0.0.82"; int svport = 11111;
     char svmsg[1500], svmsg1[1500], svmsg2[1500], svmsg3[1500];
     //setup a socket and connection tools 
     struct hostent* svhost = gethostbyname(serverIp);
@@ -120,7 +169,7 @@ int main(int argc, char* argv[])
     memset(&svmsg3, 0, sizeof(svmsg3));
     recv(clientSd, (char*)&svmsg3, sizeof(svmsg3), 0);
     const char* pt2 = svmsg3;
-    close(clientSd);
+    //close(clientSd);
     cout << pt0 << endl;
     cout << pt << endl;
     cout << pt2 << endl;
@@ -142,15 +191,16 @@ int main(int argc, char* argv[])
     myAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     myAddr.sin_port = htons(rport);
 
-    if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
-        cout << "cantbindtcp" << endl;
-        exit(1);
-    }
-
-
     int udpSd = socket(AF_INET, SOCK_DGRAM, 0);
     if (udpSd == -1) {
         cout << "cantsocket" << endl;
+    }
+
+    struct timeval tv = {
+    .tv_sec = 6
+    };
+    if (setsockopt(udpSd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+        cout << "prblm2" << endl;
     }
 
     if (bind(udpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) < 0) {
@@ -187,12 +237,28 @@ int main(int argc, char* argv[])
         }
         else {
             cout << "cant recv" << endl;
+            exitSignal1.set_value();
+            t1.join();
             break;
-            exit(1);
         }
     }
 
-    if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
+    std::thread t2;
+    cout << flg1 << flg2 << endl;
+
+    if (flg1 == false && flg2 == false) {
+
+        cout << "need relay" << endl;
+        string data = "punchedthrough";
+        memset(&msg, 0, sizeof(msg));//clear the buffer
+        strcpy(msg, (data).c_str());
+        send(clientSd, (char*)&msg, strlen(msg), 0);
+        memset(&msg, 0, sizeof(msg));//clear the buffer
+        t2 = std::thread(rcv, clientSd);
+        snd(clientSd);
+
+    }
+    else if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
         cout << "cantconnect, retrying once.." << endl;
         sleep(3);
         if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
@@ -204,55 +270,26 @@ int main(int argc, char* argv[])
             }
         }
     }
+    else {
 
-    /*cout << "hole's ready" << endl;
-    exitSignal1.set_value();
-    t1.join();*/
-    cout << "connected" << endl;
-
-    std::thread t2(rcv, tcpSd);
-    while (1)
-    {
-
-        string data, hd;
-        getline(cin, data);
+        /*cout << "hole's ready" << endl;
+        exitSignal1.set_value();
+        t1.join();*/
+        cout << "connected" << endl;
+        string data = "punchedthrough";
         memset(&msg, 0, sizeof(msg));//clear the buffer
         strcpy(msg, (data).c_str());
-        if (data == "exit")
-        {
-            send(tcpSd, (char*)&msg, strlen(msg), 0);
-            break;
-        }
-        if ((data.find(".txt") != std::string::npos) || (data.find(".doc") != std::string::npos) || (data.find(".docx") != std::string::npos) || 
-            (data.find(".xlsx") != std::string::npos) || (data.find(".cpp") != std::string::npos) || (data.find(".c") != std::string::npos))
-        {
-            ifstream f1;
-            string drtry;
-            while (1) {
-                cout << "Directory: ";
-                getline(cin, drtry);
-                f1.open(drtry + data);
-                if (f1.is_open()) {
-                    cout << "11" << endl;
-                    break;
-                }
-                else {
-                    cout << "No such file or directory  " << endl;
-                    cout << "File name: " ;
-                    getline(cin, data);
-                    if (data == "exit") {
-                        break;
-                    }
-                }
+        send(clientSd, (char*)&msg, strlen(msg), 0);
+        memset(&msg, 0, sizeof(msg));//clear the buffer
+        close(clientSd);
 
-            }
-            send(tcpSd, (char*)&msg, strlen(msg), 0);
-
+        if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
+            cout << "cantbindtcp" << endl;
+            exit(1);
         }
-        if (send(tcpSd, (char*)&msg, strlen(msg), 0) == -1) {
 
-            cout << "didn't send through" << endl;
-        }
+        t2 = std::thread(rcv, tcpSd);
+        snd(tcpSd);
 
     }
 
