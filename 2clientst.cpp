@@ -96,6 +96,11 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    int tcpSd = socket(AF_INET, SOCK_STREAM, 0);
+    if (tcpSd == -1) {
+        cout << "canttcpsocket" << endl;
+    }
+
     char* tgtip = argv[1];
     memset(&svmsg, 0, sizeof(svmsg));//clear the buffer
     strcpy(svmsg, tgtip);
@@ -131,6 +136,13 @@ int main(int argc, char* argv[])
     myAddr.sin_family = AF_INET;
     myAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     myAddr.sin_port = htons(rport);
+
+
+    if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
+        cout << "cantbindtcp" << endl;
+        exit(1);
+    }
+
 
     int udpSd = socket(AF_INET, SOCK_DGRAM, 0);
     if (udpSd == -1) {
@@ -174,16 +186,6 @@ int main(int argc, char* argv[])
             break;
             exit(1);
         }
-    }
-
-    int tcpSd = socket(AF_INET, SOCK_STREAM, 0);
-    if (tcpSd == -1) {
-        cout << "canttcpsocket" << endl;
-    }
-
-    if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
-        cout << "cantbindtcp" << endl;
-        exit(1);
     }
 
     if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
