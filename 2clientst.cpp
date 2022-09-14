@@ -108,10 +108,14 @@ int main(int argc, char* argv[])
     const char* pt = svmsg;
     cout << svmsg << endl;
     memset(&svmsg, 0, sizeof(svmsg));
+    recv(clientSd, (char*)&svmsg, sizeof(svmsg), 0);
+    const char* pt2 = svmsg;
+    cout << svmsg << endl;
+    memset(&svmsg, 0, sizeof(svmsg));
     close(clientSd);
 
     //create a message buffer 
-    char msg[1500]; sport = atoi(pt);
+    char msg[1500]; sport = atoi(pt); rport = atoi(pt2);
     //setup a socket and connection tools 
     sockaddr_in sendSockAddr;
     socklen_t ssz = sizeof(sendSockAddr);
@@ -120,21 +124,21 @@ int main(int argc, char* argv[])
     sendSockAddr.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*tgt->h_addr_list));
     sendSockAddr.sin_port = htons(sport);
 
-    /*sockaddr_in myAddr;
+    sockaddr_in myAddr;
     bzero((char*)&myAddr, sizeof(myAddr));
     myAddr.sin_family = AF_INET;
     myAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    myAddr.sin_port = htons(rport);*/
+    myAddr.sin_port = htons(rport);
 
     int udpSd = socket(AF_INET, SOCK_DGRAM, 0);
     if (udpSd == -1) {
         cout << "cantsocket" << endl;
     }
 
-    /*if (bind(udpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) < 0) {
+    if (bind(udpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) < 0) {
         cerr << "cantbind, maybe try another port" << endl;
         exit(1);
-    }*/
+    }
 
     std::promise<void> exitSignal1;
     std::future<void> futureObj1 = exitSignal1.get_future();
@@ -143,7 +147,7 @@ int main(int argc, char* argv[])
     cout << "punching.." << endl;
     bool flg1 = false;
     bool flg2 = false;
-    /*while (1) {
+    /**/while (1) {
         memset(&msg, 0, sizeof(msg));//clear the buffer
         if (recv(udpSd, (char*)msg, sizeof(msg), 0) != -1) {
             cout << "the other side: " << msg << endl;
@@ -168,7 +172,7 @@ int main(int argc, char* argv[])
             break;
             exit(1);
         }
-    }*/
+    }
 
     int tcpSd = socket(AF_INET, SOCK_STREAM, 0);
     if (tcpSd == -1) {
