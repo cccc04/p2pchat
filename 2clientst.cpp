@@ -100,7 +100,14 @@ int main(int argc, char* argv[])
     if (tcpSd == -1) {
         cout << "canttcpsocket" << endl;
     }
-    setsockopt(tcpSd, SOL_SOCKET, SO_REUSEADDR, NULL, sizeof(int));
+
+    const int opt = 1;
+    if (setsockopt(tcpSd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        cout << "prblm" << endl;
+    }
+    if (setsockopt(tcpSd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
+        cout << "prblm" << endl;
+    }
 
     char* tgtip = argv[1];
     memset(&svmsg, 0, sizeof(svmsg));//clear the buffer
