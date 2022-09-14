@@ -48,6 +48,7 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
         }
 
     }
+    close(udppSd);
 
 }
 
