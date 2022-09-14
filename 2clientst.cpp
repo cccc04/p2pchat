@@ -33,7 +33,7 @@ void punch(sockaddr_in sendSockAddr, std::future<void> futureObj) {
 
     char msg[1500];
     int i;
-    for(i = 0; i < 11; i++){
+    for(i = 0; i < 10; i++){
         if(futureObj.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
 
             cout << "bang" << endl;
