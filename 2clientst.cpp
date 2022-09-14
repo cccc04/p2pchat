@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
     char svmsg[1500], svmsg1[1500], svmsg2[1500], svmsg3[1500];
     //setup a socket and connection tools 
     struct hostent* svhost = gethostbyname(serverIp);
-    sockaddr_in svAddr;
+    sockaddr_in svAddr, sendSockAddr, myAddr;
     bzero((char*)&svAddr, sizeof(svAddr));
     svAddr.sin_family = AF_INET;
     svAddr.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*svhost->h_addr_list));
@@ -100,6 +100,7 @@ int main(int argc, char* argv[])
     if (tcpSd == -1) {
         cout << "canttcpsocket" << endl;
     }
+    setsockopt(tcpSd, SOL_SOCKET, SO_REUSEADDR, NULL, sizeof(int));
 
     char* tgtip = argv[1];
     memset(&svmsg, 0, sizeof(svmsg));//clear the buffer
@@ -120,23 +121,22 @@ int main(int argc, char* argv[])
     cout << pt << endl;
     cout << pt2 << endl;
 
+
     //create a message buffer 
     char msg[1500]; sport = atoi(pt); rport = atoi(pt2);
     //setup a socket and connection tools 
     struct hostent* host = gethostbyname(pt0);
-    sockaddr_in sendSockAddr;
+
     socklen_t ssz = sizeof(sendSockAddr);
     bzero((char*)&sendSockAddr, sizeof(sendSockAddr));
     sendSockAddr.sin_family = AF_INET;
     sendSockAddr.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*host->h_addr_list));
     sendSockAddr.sin_port = htons(sport);
 
-    sockaddr_in myAddr;
     bzero((char*)&myAddr, sizeof(myAddr));
     myAddr.sin_family = AF_INET;
     myAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     myAddr.sin_port = htons(rport);
-
 
     if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
         cout << "cantbindtcp" << endl;
