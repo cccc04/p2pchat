@@ -20,15 +20,20 @@
 #include <future>
 using namespace std;
 
+bool yyn = false;
+int udpSd;
+int tcpSd;
+
 /**
  * This client connects to the address and port of the server. It proceeds to
  * ping-pong data with another instance of itself once a second client connects
  * to the relay server.
  */
-void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
+void punch(sockaddr_in sendSockAddr, std::future<void> futureObj) {
 
     char msg[1500];
-
+    int i;
+    for(i = 0; i < 11; i++){
         while(futureObj.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
 
             cout << "bang" << endl;
@@ -44,7 +49,11 @@ void punch(sockaddr_in sendSockAddr, int udpSd, std::future<void> futureObj) {
             sleep(1);
 
         }
-
+    }
+    if (i == 10) {
+        close(udpSd);
+        yyn = true;
+    }
 }
 
 void rcv(int clientSd) {
@@ -68,7 +77,7 @@ void rcv(int clientSd) {
 
 }
 
-void snd(int tcpSd) {
+void snd(int tcpSd1) {
     char msg[1500];
     while (1)
     {
@@ -79,7 +88,7 @@ void snd(int tcpSd) {
         strcpy(msg, (data).c_str());
         if (data == "exit")
         {
-            send(tcpSd, (char*)&msg, strlen(msg), 0);
+            send(tcpSd1, (char*)&msg, strlen(msg), 0);
             break;
         }
         if ((data.find(".txt") != std::string::npos) || (data.find(".doc") != std::string::npos) || (data.find(".docx") != std::string::npos) ||
@@ -105,10 +114,10 @@ void snd(int tcpSd) {
                 }
 
             }
-            send(tcpSd, (char*)&msg, strlen(msg), 0);
+            send(tcpSd1, (char*)&msg, strlen(msg), 0);
 
         }
-        if (send(tcpSd, (char*)&msg, strlen(msg), 0) == -1) {
+        if (send(tcpSd1, (char*)&msg, strlen(msg), 0) == -1) {
 
             cout << "didn't send through" << endl;
         }
@@ -145,7 +154,7 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    int tcpSd = socket(AF_INET, SOCK_STREAM, 0);
+    tcpSd = socket(AF_INET, SOCK_STREAM, 0);
     if (tcpSd == -1) {
         cout << "canttcpsocket" << endl;
     }
@@ -191,14 +200,9 @@ int main(int argc, char* argv[])
     myAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     myAddr.sin_port = htons(rport);
 
-    int udpSd = socket(AF_INET, SOCK_DGRAM, 0);
+    udpSd = socket(AF_INET, SOCK_DGRAM, 0);
     if (udpSd == -1) {
         cout << "cantsocket" << endl;
-    }
-
-    struct timeval tv = {    .tv_sec = 6    };
-    if (setsockopt(udpSd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-        cout << "prblm2" << endl;
     }
 
     if (bind(udpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) < 0) {
@@ -209,7 +213,7 @@ int main(int argc, char* argv[])
     std::promise<void> exitSignal1;
     std::future<void> futureObj1 = exitSignal1.get_future();
 
-    thread t1(&punch, sendSockAddr, udpSd, std::move(futureObj1));
+    thread t1(&punch, sendSockAddr, std::move(futureObj1));
     cout << "punching.." << endl;
     bool flg1 = false;
     bool flg2 = false;
@@ -248,8 +252,6 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    bool yn;
-
     if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
         cout << "cantconnect, retrying once.." << endl;
         sleep(3);
@@ -257,21 +259,15 @@ int main(int argc, char* argv[])
             cout << "cantconnect, retrying twice.." << endl;
             sleep(4);
             if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
-                cout << "cantconnect, relaying.." << endl;
-                string data = "punchedfail";
-                memset(&msg, 0, sizeof(msg));//clear the buffer
-                strcpy(msg, (data).c_str());
-                send(clientSd, (char*)&msg, strlen(msg), 0);
-                memset(&msg, 0, sizeof(msg));//clear the buffer
-                exitSignal1.set_value();
-                t1.join();
-                t2 = std::thread(rcv, clientSd);
-                snd(clientSd);
-                yn = true;
+                cout << "cantconnect, abort" << endl;
+                exit(1);
             }
         }
     }
-    if(yn == false) {
+
+    bool ynn;
+
+    if(yyn == false) {
 
         cout << "hole's ready" << endl;
         exitSignal1.set_value();
@@ -288,9 +284,21 @@ int main(int argc, char* argv[])
         snd(tcpSd);
 
     }
+    else {
+        cout << "relaying" << endl;
+        string data = "punchedfail";
+        memset(&msg, 0, sizeof(msg));//clear the buffer
+        strcpy(msg, (data).c_str());
+        send(clientSd, (char*)&msg, strlen(msg), 0);
+        memset(&msg, 0, sizeof(msg));//clear the buffer
+        t2 = std::thread(rcv, clientSd);
+        snd(clientSd);
+        ynn = true;
+
+    }
 
     t2.join();
-    if (yn == true) {
+    if (ynn == true) {
         close(clientSd);
     }
     close(tcpSd);
