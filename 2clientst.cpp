@@ -31,6 +31,7 @@ int tcpSd;
  */
 void punch(sockaddr_in sendSockAddr, std::future<void> futureObj) {
 
+    bool yxn = false;
     char msg[1500];
     int i;
     for(i = 0; i < 10; i++){
@@ -49,8 +50,11 @@ void punch(sockaddr_in sendSockAddr, std::future<void> futureObj) {
             sleep(1);
 
         }
+        else {
+            yxn = true;
+        }
     }
-    if (i == 10) {
+    if (yxn == false) {
         close(udpSd);
         close(tcpSd);
         yyn = true;
@@ -206,6 +210,11 @@ int main(int argc, char* argv[])
         cout << "cantsocket" << endl;
     }
 
+    if (setsockopt(udpSd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        cout << "prblm2" << endl;
+    }
+
+
     if (bind(udpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) < 0) {
         cerr << "cantbind, maybe try another port" << endl;
         exit(1);
@@ -260,13 +269,10 @@ int main(int argc, char* argv[])
             cout << "cantconnect, retrying twice.." << endl;
             sleep(4);
             if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
-                cout << "cantconnect, abort" << endl;
-                exit(1);
+                cout << "cantconnect, relaying.." << endl;
             }
         }
     }
-
-    bool ynn;
 
     if(yyn == false) {
 
@@ -280,6 +286,7 @@ int main(int argc, char* argv[])
         send(clientSd, (char*)&msg, strlen(msg), 0);
         memset(&msg, 0, sizeof(msg));//clear the buffer
         close(clientSd);
+        close(udpSd);
 
         t2 = std::thread(rcv, tcpSd);
         snd(tcpSd);
@@ -294,16 +301,16 @@ int main(int argc, char* argv[])
         memset(&msg, 0, sizeof(msg));//clear the buffer
         t2 = std::thread(rcv, clientSd);
         snd(clientSd);
-        ynn = true;
 
     }
 
     t2.join();
-    if (ynn == true) {
+    if (yyn == true) {
         close(clientSd);
     }
-    close(tcpSd);
-    close(udpSd);
+    else {
+        close(tcpSd);
+    }
     cout << "********Session********" << endl;
     cout << "Connection closed" << endl;
 
