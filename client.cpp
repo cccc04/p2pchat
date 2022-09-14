@@ -60,10 +60,10 @@ int main(int argc, char *argv[])
     myAddr.sin_port = htons(5555);
 
     int clientSd = socket(AF_INET, SOCK_STREAM, 0);
-    if (bind(clientSd, (struct sockaddr*)&myAddr,
+    /*if (bind(clientSd, (struct sockaddr*)&myAddr,
         sizeof(myAddr)) < 0) {
         cout << "cantbind" << endl;
-    }
+    }*/
     //try to connect...
     int status = connect(clientSd,
                          (sockaddr*) &sendSockAddr, sizeof(sendSockAddr));
