@@ -174,18 +174,27 @@ int main(int argc, char* argv[])
     send(clientSd, (char*)&svmsg, strlen(svmsg), 0);
     int sport; int rport;
     memset(&svmsg1, 0, sizeof(svmsg1));
-    recv(clientSd, (char*)&svmsg1, sizeof(svmsg1), 0);
+    while (recv(clientSd, (char*)&svmsg1, sizeof(svmsg1), 0) == 0) {
+        memset(&svmsg1, 0, sizeof(svmsg1));
+        cout << "1" << endl;
+    }
     const char* pt0 = svmsg1;
     memset(&svmsg2, 0, sizeof(svmsg2));
-    recv(clientSd, (char*)&svmsg2, sizeof(svmsg2), 0);
+    while (recv(clientSd, (char*)&svmsg2, sizeof(svmsg2), 0) == 0) {
+        memset(&svmsg2, 0, sizeof(svmsg2));
+        cout << "1" << endl;
+    }
     const char* pt = svmsg2;
     memset(&svmsg3, 0, sizeof(svmsg3));
-    recv(clientSd, (char*)&svmsg3, sizeof(svmsg3), 0);
+    while (recv(clientSd, (char*)&svmsg3, sizeof(svmsg3), 0) == 0) {
+        memset(&svmsg3, 0, sizeof(svmsg3));
+        cout << "1" << endl;
+    }
     const char* pt2 = svmsg3;
     //close(clientSd);
-    cout << pt0 << "/" << svmsg1 << endl;
-    cout << pt << "/" << svmsg2 << endl;
-    cout << pt2 << "/" << svmsg3 << endl;
+    cout << pt0 << endl;
+    cout << pt << endl;
+    cout << pt2 << endl;
 
 
     //create a message buffer 
