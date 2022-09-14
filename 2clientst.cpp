@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
         cerr << "Usage: cipher " << endl; exit(0);
     } //grab the IP address and port number
 
-    char* serverIp = "10.0.0.82"; int svport = 11111;
+    char* serverIp = "24.5.179.24"; int svport = 11111;
     char svmsg[1500], svmsg1[1500], svmsg2[1500], svmsg3[1500];
     //setup a socket and connection tools 
     struct hostent* svhost = gethostbyname(serverIp);
@@ -103,9 +103,6 @@ int main(int argc, char* argv[])
 
     const int opt = 1;
     if (setsockopt(tcpSd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-        cout << "prblm" << endl;
-    }
-    if (setsockopt(tcpSd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
         cout << "prblm" << endl;
     }
 
