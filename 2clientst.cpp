@@ -306,6 +306,8 @@ int main(int argc, char* argv[])
 
     }
     else {
+
+        t1.join();
         cout << "relaying" << endl;
         string data = "punchedfail";
         memset(&msg, 0, sizeof(msg));//clear the buffer
