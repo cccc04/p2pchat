@@ -300,7 +300,6 @@ int main(int argc, char* argv[])
         send(clientSd, (char*)&msg, strlen(msg), 0);
         memset(&msg, 0, sizeof(msg));//clear the buffer
         close(clientSd);
-        close(udpSd);
 
         t2 = std::thread(rcv, tcpSd);
         snd(tcpSd);
@@ -313,6 +312,8 @@ int main(int argc, char* argv[])
         strcpy(msg, (data).c_str());
         send(clientSd, (char*)&msg, strlen(msg), 0);
         memset(&msg, 0, sizeof(msg));//clear the buffer
+        close(tcpSd);
+
         t2 = std::thread(rcv, clientSd);
         snd(clientSd);
 
@@ -325,6 +326,7 @@ int main(int argc, char* argv[])
     else {
         close(tcpSd);
     }
+    close(udpSd);
     cout << "********Session********" << endl;
     cout << "Connection closed" << endl;
 
