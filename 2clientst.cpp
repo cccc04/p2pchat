@@ -34,10 +34,10 @@ void punch(sockaddr_in sendSockAddr, std::future<void> futureObj) {
     bool yxn = false;
     char msg[1500];
     int i;
-    for(i = 0; i < 10; i++){
+    for(i = 0; i < 7; i++){
         if(futureObj.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
 
-            //cout << "bang" << endl;
+            cout << "bang" << endl;
             memset(&msg, 0, sizeof(msg));//clear the buffer
             strcpy(msg, "BANG");
             if (sendto(udpSd, (char*)msg, sizeof(msg), 0, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
@@ -298,11 +298,11 @@ int main(int argc, char* argv[])
 
         if (yyn == false) {
             cout << "cantconnect, retrying once.." << endl;
-            sleep(3);
-            if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
+            sleep(1);
+            if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
                 cout << "cantconnect, retrying twice.." << endl;
-                sleep(4);
-                if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
+                sleep(5);
+                if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
                     cout << "cantconnect, abort" << endl;
                     exit(1);
                 }
