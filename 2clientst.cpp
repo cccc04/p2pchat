@@ -34,7 +34,7 @@ void punch(sockaddr_in sendSockAddr, std::future<void> futureObj) {
     bool yxn = false;
     char msg[1500];
     int i;
-    for(i = 0; i < 7; i++){
+    for(i = 0; i < 8; i++){
         if(futureObj.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
 
             //cout << "bang" << endl;
@@ -66,10 +66,17 @@ void rcv(int clientSd) {
     {
         //cout << "Awaiting server response..." << endl;
         memset(&msg, 0, sizeof(msg));//clear the buffer
+        int a = recv(clientSd, (char*)&msg, sizeof(msg), 0);
 
-        if (recv(clientSd, (char*)&msg, sizeof(msg), 0) == -1) {
+        if ( a == -1) {
             cout << "cant recv" << endl;
             sleep(3);
+        }
+        if (a == 0) {
+
+            cout << "lost connection" << endl;
+            break;
+
         }
         if (!strcmp(msg, "exit"))
         {
