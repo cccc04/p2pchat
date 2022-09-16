@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
 
         if (yyn == false) {
             cout << "cantconnect, retrying once.." << endl;
-            sleep(1);
+            sleep(2);
             if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
                 cout << "cantconnect, retrying twice.." << endl;
                 sleep(7);
