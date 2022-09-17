@@ -60,6 +60,44 @@ void punch(sockaddr_in sendSockAddr, std::future<void> futureObj) {
     }
 }
 
+sockaddr_in smt() {
+    int sock = socket(PF_INET, SOCK_DGRAM, 0);
+    sockaddr_in loopback;
+
+    if (sock == -1) {
+        std::cerr << "Could not socket\n";
+    }
+
+    memset(&loopback, 0, sizeof(loopback));
+    loopback.sin_family = AF_INET;
+    loopback.sin_addr.s_addr = 1337;   // can be any IP address
+    loopback.sin_port = htons(9);      // using debug port
+
+    if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1) {
+        close(sock);
+        std::cerr << "Could not connect\n";
+    }
+
+    socklen_t addrlen = sizeof(loopback);
+    if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1) {
+        close(sock);
+        std::cerr << "Could not getsockname\n";
+    }
+
+    close(sock);
+
+    char buf[INET_ADDRSTRLEN];
+    if (inet_ntop(AF_INET, &loopback.sin_addr, buf, INET_ADDRSTRLEN) == 0x0) {
+        std::cerr << "Could not inet_ntop\n";
+    }
+    else {
+        std::cout << "Local ip address: " << buf << "\n";
+    }
+
+    return loopback;
+
+}
+
 void rcv(int clientSd) {
     char msg[1500];
     while (1)
@@ -146,7 +184,7 @@ int main(int argc, char* argv[])
     } //grab the IP address and port number
 
     char* serverIp = "24.5.179.24"; int svport = 11111;
-    char svmsg[1500], svmsg1[1500], svmsg2[1500], svmsg3[1500];
+    char svmsg[1500], svmsg1[1500], svmsg2[1500], svmsg3[1500], svmsg4[1500];
     //setup a socket and connection tools 
     struct hostent* svhost = gethostbyname(serverIp);
     sockaddr_in svAddr, sendSockAddr, myAddr;
@@ -199,21 +237,35 @@ int main(int argc, char* argv[])
     }
 
     const char* pt2 = svmsg3;
+
+    if (recv(clientSd, (char*)&svmsg4, sizeof(svmsg4), 0) < 0) {
+        cout << "didntrcv" << endl;
+    }
+
+    const char* pt3 = svmsg4;
     cout << pt0 << endl;
     cout << pt << endl;
     cout << pt2 << endl;
+    cout << pt3 << endl;
 
 
     //create a message buffer 
     char msg[1500]; sport = atoi(pt); rport = atoi(pt2);
     //setup a socket and connection tools 
     struct hostent* host = gethostbyname(pt0);
+    struct hostent* host1 = gethostbyname(pt3);
 
     socklen_t ssz = sizeof(sendSockAddr);
     bzero((char*)&sendSockAddr, sizeof(sendSockAddr));
     sendSockAddr.sin_family = AF_INET;
-    sendSockAddr.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*host->h_addr_list));
     sendSockAddr.sin_port = htons(sport);
+
+    if (!strcmp(pt0, pt3)) {
+        sendSockAddr.sin_addr.s_addr = smt().sin_addr.s_addr;
+    }
+    else {
+        sendSockAddr.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*host->h_addr_list));
+    }
 
     bzero((char*)&myAddr, sizeof(myAddr));
     myAddr.sin_family = AF_INET;
