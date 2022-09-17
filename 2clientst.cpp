@@ -284,7 +284,7 @@ int main(int argc, char* argv[])
             sleep(1);
             if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
                 cout << "cantconnect, retrying twice.." << endl;
-                sleep(5);
+                sleep(7);
                 if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
                     cout << "cantconnect, abort" << endl;
                     exit(1);
