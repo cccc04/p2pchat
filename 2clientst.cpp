@@ -213,10 +213,15 @@ int main(int argc, char* argv[])
         cout << "prblm" << endl;
     }
 
-    char* tgtip = argv[1];
+    char* tgtip = argv[1]; char abb[INET_ADDRSTRLEN];
     memset(&svmsg, 0, sizeof(svmsg));//clear the buffer
     strcpy(svmsg, tgtip);
     send(clientSd, (char*)&svmsg, strlen(svmsg), 0);
+    memset(&svmsg4, 0, sizeof(svmsg4));
+    sockaddr_in fm = smt();
+    strcpy(svmsg4, inet_ntop(AF_INET, &(fm.sin_addr.s_addr), abb, INET_ADDRSTRLEN));
+    sleep(1);
+    send(clientSd, (char*)svmsg4, sizeof(svmsg4), 0);
     int sport; int rport;
     memset(&svmsg1, 0, sizeof(svmsg1));    
     if (recv(clientSd, (char*)&svmsg1, sizeof(svmsg1), 0) < 0) {
@@ -238,34 +243,21 @@ int main(int argc, char* argv[])
 
     const char* pt2 = svmsg3;
 
-    if (recv(clientSd, (char*)&svmsg4, sizeof(svmsg4), 0) < 0) {
-        cout << "didntrcv" << endl;
-    }
-
-    const char* pt3 = svmsg4;
     cout << pt0 << endl;
     cout << pt << endl;
     cout << pt2 << endl;
-    cout << pt3 << endl;
 
 
     //create a message buffer 
     char msg[1500]; sport = atoi(pt); rport = atoi(pt2);
     //setup a socket and connection tools 
     struct hostent* host = gethostbyname(pt0);
-    struct hostent* host1 = gethostbyname(pt3);
 
     socklen_t ssz = sizeof(sendSockAddr);
     bzero((char*)&sendSockAddr, sizeof(sendSockAddr));
     sendSockAddr.sin_family = AF_INET;
+    sendSockAddr.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*host->h_addr_list));
     sendSockAddr.sin_port = htons(sport);
-
-    if (!strcmp(pt0, pt3)) {
-        sendSockAddr.sin_addr.s_addr = smt().sin_addr.s_addr;
-    }
-    else {
-        sendSockAddr.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)*host->h_addr_list));
-    }
 
     bzero((char*)&myAddr, sizeof(myAddr));
     myAddr.sin_family = AF_INET;
