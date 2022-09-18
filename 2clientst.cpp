@@ -71,7 +71,7 @@ sockaddr_in smt() {
     memset(&loopback, 0, sizeof(loopback));
     loopback.sin_family = AF_INET;
     loopback.sin_addr.s_addr = 1337;   // can be any IP address
-    loopback.sin_port = htons(9);      // using debug port
+    loopback.sin_port = htons(9999);      // using debug port
 
     if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1) {
         close(sock);
@@ -222,6 +222,7 @@ int main(int argc, char* argv[])
     strcpy(svmsg4, inet_ntop(AF_INET, &(fm.sin_addr.s_addr), abb, INET_ADDRSTRLEN));
     sleep(1);
     send(clientSd, (char*)svmsg4, sizeof(svmsg4), 0);
+    bzero((char*)&fm, sizeof(fm));
     int sport; int rport;
     memset(&svmsg1, 0, sizeof(svmsg1));    
     if (recv(clientSd, (char*)&svmsg1, sizeof(svmsg1), 0) <= 0) {
