@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
     } //grab the IP address and port number
 
     char* serverIp = "24.5.179.24"; int svport = 11111;
-    char svmsg[1500], svmsg1[1500], svmsg2[1500], svmsg3[1500], svmsg4[1500];
+    char svmsg[50], svmsg1[50], svmsg2[50], svmsg3[50], svmsg4[50];
     //setup a socket and connection tools 
     struct hostent* svhost = gethostbyname(serverIp);
     sockaddr_in svAddr, sendSockAddr, myAddr;
