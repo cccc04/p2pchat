@@ -224,27 +224,36 @@ int main(int argc, char* argv[])
     send(clientSd, (char*)svmsg4, sizeof(svmsg4), 0);
     bzero((char*)&fm, sizeof(fm));
     int sport; int rport;
-    memset(&svmsg1, 0, sizeof(svmsg1));    
-    if (recv(clientSd, (char*)&svmsg1, sizeof(svmsg1), 0) <= 0) {
+    memset(&svmsg1, 0, sizeof(svmsg1)); 
+    int f1, f2, f3;
+    f1 = recv(clientSd, (char*)&svmsg1, sizeof(svmsg1), 0);
+    if ( f1 <= 0) {
             cout << "didntrcv" << endl;
     }
     const char* pt0 = svmsg1;
+    cout << svmsg1 << "(bytes:" << f1 << ")" << endl;
     cout << pt0 << endl;
-    memset(&svmsg2, 0, sizeof(svmsg2));
 
-    if (recv(clientSd, (char*)&svmsg2, sizeof(svmsg2), 0) <= 0) {
+
+    memset(&svmsg2, 0, sizeof(svmsg2));
+    f2 = recv(clientSd, (char*)&svmsg2, sizeof(svmsg2), 0);
+    if ( f2 <= 0) {
             cout << "didntrcv" << endl;
     }
 
     const char* pt = svmsg2;
+    cout << svmsg2 << "(bytes:" << f2 << ")" << endl;
     cout << pt << endl;
+
+
     memset(&svmsg3, 0, sizeof(svmsg3));
- 
-    if (recv(clientSd, (char*)&svmsg3, sizeof(svmsg3), 0) < 0) {
+    f3 = recv(clientSd, (char*)&svmsg3, sizeof(svmsg3), 0);
+    if ( f3 <= 0) {
             cout << "didntrcv" << endl;
     }
 
     const char* pt2 = svmsg3;
+    cout << svmsg3 << "(bytes:" << f3 << ")" << endl;
     cout << pt2 << endl;
 
     //create a message buffer 
