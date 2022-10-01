@@ -225,6 +225,8 @@ int main(int argc, char* argv[])
     bzero((char*)&fm, sizeof(fm));
     int sport; int rport;
     memset(&svmsg1, 0, sizeof(svmsg1)); 
+    memset(&svmsg2, 0, sizeof(svmsg2));
+    memset(&svmsg3, 0, sizeof(svmsg3));
     int f1, f2, f3;
     f1 = recv(clientSd, (char*)&svmsg1, sizeof(svmsg1), 0);
     if ( f1 <= 0) {
@@ -235,7 +237,6 @@ int main(int argc, char* argv[])
     cout << pt0 << endl;
 
 
-    memset(&svmsg2, 0, sizeof(svmsg2));
     f2 = recv(clientSd, (char*)&svmsg2, sizeof(svmsg2), 0);
     if ( f2 <= 0) {
             cout << "didntrcv" << endl;
@@ -246,7 +247,6 @@ int main(int argc, char* argv[])
     cout << pt << endl;
 
 
-    memset(&svmsg3, 0, sizeof(svmsg3));
     f3 = recv(clientSd, (char*)&svmsg3, sizeof(svmsg3), 0);
     if ( f3 <= 0) {
             cout << "didntrcv" << endl;
