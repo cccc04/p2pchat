@@ -121,7 +121,37 @@ void rcv(int clientSd) {
             cout << "someone has quit the session" << endl;
             break;
         }
+
         cout << ">someone: " << msg << endl;
+
+        string sr;
+        for (int i = 0; i < strlen(msg); i++) {
+
+            sr.push_back(msg[i]);
+            if ((sr.find(".txt") != std::string::npos) || (sr.find(".doc") != std::string::npos) || (sr.find(".docx") != std::string::npos) ||
+                (sr.find(".xlsx") != std::string::npos) || (sr.find(".cpp") != std::string::npos) || (sr.find(".c") != std::string::npos) || (sr.find(".pptx") != std::string::npos)
+                || (sr.find(".pdf") != std::string::npos) || (sr.find(".png") != std::string::npos) || (sr.find(".jpg") != std::string::npos))
+            {
+                cout << "receiving file.." << endl;
+                memset(&msg, 0, sizeof(msg));
+                recv(clientSd, (char*)&msg, sizeof(msg), 0);
+                cout << "size: " << msg << "bytes" << endl;
+                int i = 0;
+                char* buffer = new char[atoi(msg)];
+                while (i < atoi(msg)) {
+                    const int l = recv(clientSd, &buffer[i], min(4096, atoi(msg) - i), 0);
+                    if (l < 0) { cout << "bs" << endl; } // this is an error
+                    i += l;
+                }
+                cout << "file received " << i << " bytes" << endl;
+                ofstream file(sr, ios::binary);
+                file.write(buffer, atoi(msg));
+                delete[] buffer;
+                file.close();
+                cout << "yay" << endl;
+                break;
+            }
+        }
     }
 
 }
@@ -131,9 +161,9 @@ void snd(int tcpSd1) {
     while (1)
     {
 
+        memset(&msg, 0, sizeof(msg));//clear the buffer
         string data, hd;
         getline(cin, data);
-        memset(&msg, 0, sizeof(msg));//clear the buffer
         strcpy(msg, (data).c_str());
         if (data == "exit")
         {
@@ -141,16 +171,37 @@ void snd(int tcpSd1) {
             break;
         }
         if ((data.find(".txt") != std::string::npos) || (data.find(".doc") != std::string::npos) || (data.find(".docx") != std::string::npos) ||
-            (data.find(".xlsx") != std::string::npos) || (data.find(".cpp") != std::string::npos) || (data.find(".c") != std::string::npos))
+            (data.find(".xlsx") != std::string::npos) || (data.find(".cpp") != std::string::npos) || (data.find(".c") != std::string::npos) || (data.find(".jpg") != std::string::npos)
+            || (data.find(".pptx") != std::string::npos) || (data.find(".pdf") != std::string::npos) || (data.find(".png") != std::string::npos))
         {
             ifstream f1;
             string drtry;
             while (1) {
                 cout << "Directory: ";
                 getline(cin, drtry);
-                f1.open(drtry + data);
+                f1.open(drtry + data, ios::binary);
                 if (f1.is_open()) {
+                    send(tcpSd1, (char*)&msg, strlen(msg), 0);
                     cout << "11" << endl;
+                    f1.seekg(0, ios::end);
+                    int s1 = f1.tellg();
+                    f1.seekg(0, ios::beg);
+                    char* buffer = new char[s1];
+                    f1.read(buffer, s1);
+                    f1.close();
+                    memset(&msg, 0, sizeof(msg));
+                    strcpy(msg, (to_string(s1)).c_str());
+                    send(tcpSd1, (char*)&msg, strlen(msg), 0);
+                    usleep(200000);
+                    cout << "size: " << msg << endl;
+                    int i = 0;
+                    while (i < s1) {
+                        const int l = send(tcpSd1, &buffer[i], min(4096, s1 - i), 0);
+                        if (l < 0) { cout << "bs" << endl; } // this is an error
+                        i += l;
+                    }
+                    delete[] buffer;
+                    cout << "file sent " << i << " bytes" << endl;
                     break;
                 }
                 else {
@@ -163,10 +214,9 @@ void snd(int tcpSd1) {
                 }
 
             }
-            send(tcpSd1, (char*)&msg, strlen(msg), 0);
 
         }
-        if (send(tcpSd1, (char*)&msg, strlen(msg), 0) == -1) {
+        else if (send(tcpSd1, (char*)&msg, strlen(msg), 0) == -1) {
 
             cout << "didn't send through" << endl;
         }
@@ -336,7 +386,7 @@ int main(int argc, char* argv[])
             sleep(2);
             if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
                 cout << "cantconnect, retrying twice.." << endl;
-                sleep(7);
+                sleep(5);
                 if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
                     cout << "cantconnect, abort" << endl;
                     exit(1);
