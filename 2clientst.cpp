@@ -130,7 +130,7 @@ void rcv(int clientSd) {
             sr.push_back(msg[i]);
             if ((sr.find(".txt") != std::string::npos) || (sr.find(".doc") != std::string::npos) || (sr.find(".docx") != std::string::npos) ||
                 (sr.find(".xlsx") != std::string::npos) || (sr.find(".cpp") != std::string::npos) || (sr.find(".c") != std::string::npos) || (sr.find(".pptx") != std::string::npos)
-                || (sr.find(".pdf") != std::string::npos) || (sr.find(".png") != std::string::npos) || (sr.find(".jpg") != std::string::npos))
+                || (sr.find(".pdf") != std::string::npos) || (sr.find(".png") != std::string::npos) || (sr.find(".jpg") != std::string::npos) || (sr.find(".zip") != std::string::npos) || (sr.find(".gz") != std::string::npos))
             {
                 cout << "receiving file.." << endl;
                 memset(&msg, 0, sizeof(msg));
@@ -172,7 +172,7 @@ void snd(int tcpSd1) {
         }
         if ((data.find(".txt") != std::string::npos) || (data.find(".doc") != std::string::npos) || (data.find(".docx") != std::string::npos) ||
             (data.find(".xlsx") != std::string::npos) || (data.find(".cpp") != std::string::npos) || (data.find(".c") != std::string::npos) || (data.find(".jpg") != std::string::npos)
-            || (data.find(".pptx") != std::string::npos) || (data.find(".pdf") != std::string::npos) || (data.find(".png") != std::string::npos))
+            || (data.find(".pptx") != std::string::npos) || (data.find(".pdf") != std::string::npos) || (data.find(".png") != std::string::npos) || (data.find(".zip") != std::string::npos) || (data.find(".gz") != std::string::npos))
         {
             ifstream f1;
             string drtry;
@@ -332,10 +332,7 @@ int main(int argc, char* argv[])
     }
 
 
-    if (bind(udpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) < 0) {
-        cerr << "cantbind, maybe try another port" << endl;
-        exit(1);
-    }
+    bind(udpSd, (struct sockaddr*)&myAddr, sizeof(myAddr));
 
     std::promise<void> exitSignal1;
     std::future<void> futureObj1 = exitSignal1.get_future();
@@ -374,10 +371,7 @@ int main(int argc, char* argv[])
 
     std::thread t2;
 
-    if (bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
-        cout << "cantbindtcp" << endl;
-        exit(1);
-    }
+    bind(tcpSd, (struct sockaddr*)&myAddr, sizeof(myAddr));
 
     if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
 
