@@ -383,10 +383,36 @@ int main(int argc, char* argv[])
 
         if (yyn == false) {
             cout << "cantconnect, retrying once.." << endl;
-            sleep(2);
+            for (int i = 0; i < 20; i++) {
+
+                if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
+                
+                    usleep(200000);
+                
+                }
+                else {
+
+                    break;
+
+                }
+
+            }
             if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
                 cout << "cantconnect, retrying twice.." << endl;
-                sleep(5);
+                for (int i = 0; i < 20; i++) {
+
+                    if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
+
+                        usleep(100000);
+
+                    }
+                    else {
+
+                        break;
+
+                    }
+
+                }
                 if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
                     cout << "cantconnect, abort" << endl;
                     exit(1);
