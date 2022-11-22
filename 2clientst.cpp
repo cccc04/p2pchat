@@ -23,6 +23,7 @@ using namespace std;
 bool yyn = false;
 int udpSd;
 int tcpSd;
+int tcptd[200];
 
 /**
  * This client connects to the address and port of the server. It proceeds to
@@ -257,7 +258,7 @@ int main(int argc, char* argv[])
     if (tcpSd == -1) {
         cout << "canttcpsocket" << endl;
     }
-
+    
     const int opt = 1;
     if (setsockopt(tcpSd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
         cout << "prblm" << endl;
@@ -331,7 +332,6 @@ int main(int argc, char* argv[])
         cout << "prblm2" << endl;
     }
 
-
     if (::bind(udpSd, (struct sockaddr*)&myAddr, sizeof(myAddr)) < 0) {
         cerr << "cantbind, maybe try another port" << endl;
         exit(1);
@@ -378,42 +378,81 @@ int main(int argc, char* argv[])
         cout << "cantbindtcp" << endl;
         exit(1);
     }
-
+    
+    bool xc = false;
+    
     if (connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
+
+        cout << errno << endl;
+        close(tcpSd);
 
         if (yyn == false) {
             cout << "cantconnect, retrying once.." << endl;
+            usleep(200000);
             for (int i = 0; i < 20; i++) {
 
-                if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
+                tcptd[i] = socket(AF_INET, SOCK_STREAM, 0);
+                if (tcptd[i] == -1) {
+                    cout << "canttcpsocket" << endl;
+                }
+
+                if (setsockopt(tcptd[i], SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+                    cout << "prblm" << endl;
+                }
+                if (::bind(tcptd[i], (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
+                    cout << "cantbindtcp" << endl;
+                    exit(1);
+                }
+                if (connect(tcptd[i], (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
                 
+                    cout << errno << endl;
+                    close(tcptd[i]);
                     usleep(200000);
                 
                 }
                 else {
 
+                    tcpSd = tcptd[i];
+                    xc = true;
                     break;
 
                 }
 
             }
-            if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
+            if (connect(tcptd[20], (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1 && yyn == false && xc == false) {
                 cout << "cantconnect, retrying twice.." << endl;
-                for (int i = 0; i < 20; i++) {
+                for (int i = 21; i < 200; i++) {
 
-                    if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
+                    tcptd[i] = socket(AF_INET, SOCK_STREAM, 0);
+                    if (tcptd[i] == -1) {
+                        cout << "canttcpsocket" << endl;
+                    }
 
-                        usleep(100000);
-
+                    if (setsockopt(tcptd[i], SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+                        cout << "prblm" << endl;
+                    }
+                    if (::bind(tcptd[i], (struct sockaddr*)&myAddr, sizeof(myAddr)) == -1) {
+                        cout << "cantbindtcp" << endl;
+                        exit(1);
+                    }
+                    if (connect(tcptd[i], (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
+                    
+                        cout << errno << endl;
+                        close(tcptd[i]);
+                        usleep(5000);
+                    
                     }
                     else {
 
+                        tcpSd = tcptd[i];
+                        xc = true;
                         break;
 
                     }
 
+
                 }
-                if ((connect(tcpSd, (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) && yyn == false) {
+                if (yyn == false && xc == false) {
                     cout << "cantconnect, abort" << endl;
                     exit(1);
                 }
