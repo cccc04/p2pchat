@@ -403,7 +403,7 @@ int main(int argc, char* argv[])
                     cout << "cantbindtcp" << endl;
                     exit(1);
                 }
-                if (connect(tcptd[i], (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
+                if (connect(tcptd[i], (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1 && yyn == false) {
                 
                     cout << errno << endl;
                     close(tcptd[i]);
@@ -435,7 +435,7 @@ int main(int argc, char* argv[])
                         cout << "cantbindtcp" << endl;
                         exit(1);
                     }
-                    if (connect(tcptd[i], (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1) {
+                    if (connect(tcptd[i], (sockaddr*)&sendSockAddr, sizeof(sendSockAddr)) == -1 && yyn == false) {
                     
                         cout << errno << endl;
                         close(tcptd[i]);
